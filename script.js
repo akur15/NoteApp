@@ -122,17 +122,35 @@ class NoteItem extends HTMLElement {
             <h2></h2>
             <p></p>
             <small></small>
+            <p class="created-at"></p>
         `;
     }
 
     set note(note) {
         this.querySelector('h2').textContent = note.title;
         this.querySelector('p').textContent = note.body;
-        this.querySelector('small').textContent = new Date(note.createdAt).toLocaleString();
+        this.querySelector('small').textContent = `Arsip: ${note.archived ? 'Ya' : 'Tidak'}`;
+        this.querySelector('.created-at').textContent = `Dibuat pada: ${new Date(note.createdAt).toLocaleString()}`;
     }
 }
 
 customElements.define('note-item', NoteItem);
+
+class NoteList extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    connectedCallback() {
+        notesData.forEach((note) => {
+            const noteItem = document.createElement('note-item');
+            noteItem.note = note;
+            this.appendChild(noteItem);
+        });
+    }
+}
+
+customElements.define('note-list', NoteList);
 
 class NoteForm extends HTMLElement {
     constructor() {
@@ -148,25 +166,3 @@ class NoteForm extends HTMLElement {
 }
 
 customElements.define('note-form', NoteForm);
-
-class NoteList extends HTMLElement {
-    constructor() {
-        super();
-        this.innerHTML = '';
-    }
-
-    set notes(notes) {
-        notes.forEach((note) => {
-            const noteItem = document.createElement('note-item');
-            noteItem.note = note;
-            this.appendChild(noteItem);
-        });
-    }
-}
-
-customElements.define('note-list', NoteList);
-
-const noteListElement = document.querySelector('.note-list');
-const noteList = new NoteList();
-noteList.notes = notesData;
-noteListElement.parentNode.replaceChild(noteList, noteListElement);
